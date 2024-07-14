@@ -37,7 +37,6 @@ const handleJWTExpiredError = () =>
   new AppError("Your token has expired! Please log in again.", 401);
 
 const sendErrorDev = async (err, req, res) => {
-  // A) API
   if (req.originalUrl.startsWith("/api")) {
     return res.status(err.statusCode).json({
       status: err.status,
@@ -47,7 +46,6 @@ const sendErrorDev = async (err, req, res) => {
     });
   }
 
-  // B) RENDERED WEBSITE
   console.error("ERROR 💥", err);
   const errorId = await saveError(err);
   return res.status(err.statusCode).render("error", {
@@ -57,9 +55,7 @@ const sendErrorDev = async (err, req, res) => {
 };
 
 const sendErrorProd = async (err, req, res) => {
-  // A) API
   if (req.originalUrl.startsWith("/api")) {
-    // A) Operational, trusted error: send message to client
     if (err.isOperational) {
       const errorId = await saveError(err);
       return res.status(err.statusCode).json({
@@ -68,10 +64,7 @@ const sendErrorProd = async (err, req, res) => {
       });
     }
 
-    // B) Programming or other unknown error: don't leak error details
-    // 1) Log error
     console.error("ERROR 💥", err);
-    // 2) Send generic message
     const errorId = await saveError(err);
     return res.status(500).json({
       status: "error",
@@ -79,10 +72,7 @@ const sendErrorProd = async (err, req, res) => {
     });
   }
 
-  // B) RENDERED WEBSITE
-  // A) Operational, trusted error: send message to client
   if (err.isOperational) {
-    // console.log(err);
     const errorId = await saveError(err);
     return res.status(err.statusCode).render("error", {
       title: "Something went wrong!",
@@ -90,10 +80,7 @@ const sendErrorProd = async (err, req, res) => {
     });
   }
 
-  // B) Programming or other unknown error: don't leak error details
-  // 1) Log error
   console.error("ERROR 💥", err);
-  // 2) Send generic message
   const errorId = await saveError(err);
   return res.status(err.statusCode).render("error", {
     title: "Something went wrong!",
@@ -102,7 +89,6 @@ const sendErrorProd = async (err, req, res) => {
 };
 
 export default function globalErrorHandler(err, req, res, next) {
-  // console.log(err.stack);
 
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
