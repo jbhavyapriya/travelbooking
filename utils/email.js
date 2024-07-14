@@ -4,19 +4,16 @@ import HtmlToText from "html-to-text";
 
 const { htmlToText } = HtmlToText;
 
-// For create email obj to send actual emails.
 export default class Email {
   constructor(user, url) {
     this.to = user.email;
     this.firstName = user.name.split(" ")[0];
     this.url = url;
-    this.from = `Lakshman Gope <${process.env.EMAIL_FROM}>`;
+    this.from = `Bhavya <${process.env.EMAIL_FROM}>`;
   }
 
-  // Create different transports for different environments
   newTransport() {
     if (process.env.NODE_ENV === "production") {
-      // Sendgrid
       return nodemailer.createTransport({
         service: "SendGrid",
         auth: {
@@ -36,16 +33,13 @@ export default class Email {
     });
   }
 
-  // Send the actual email
   async send(template, subject) {
-    // 1) Render HTML based on a pug template
     const html = pug.renderFile(`${__dirname}/../views/email/${template}.pug`, {
       firstName: this.firstName,
       url: this.url,
       subject
     });
 
-    // 2) Define email options
     const mailOptions = {
       from: this.from,
       to: this.to,
@@ -54,7 +48,6 @@ export default class Email {
       text: htmlToText.fromString(html)
     };
 
-    // 3) Create a transport and send email
     await this.newTransport().sendMail(mailOptions);
   }
 
