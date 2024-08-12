@@ -2,9 +2,7 @@
 
 import axios from "axios";
 import { showAlert } from "./alerts";
-import keys from "../../config/keys";
-
-const stripe = Stripe(keys.stripeKey);
+const stripe = Stripe('pk_test_BUkd0ZXAj6m0q0jMyRgBxNns00PPtgvjjr');
 
 export const bookTour = async tourId => {
   try {
